@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // Bentuk data mentah dari backend (PascalCase + image_url snake_case)
-const GameApiSchema = z.object({
+export const GameApiSchema = z.object({
   ID: z.number(),
   Name: z.string(),
   Code: z.string(),

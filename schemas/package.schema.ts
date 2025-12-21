@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // Bentuk data mentah dari backend (PascalCase)
-const PackageApiSchema = z.object({
+export const PackageApiSchema = z.object({
   ID: z.number(),
   GameID: z.number(),
   Name: z.string(),
