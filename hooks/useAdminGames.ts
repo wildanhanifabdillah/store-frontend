@@ -1,70 +1,39 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
-import {
-  GamesResponseSchema,
-  Game,
-  CreateGamePayload,
-  UpdateGamePayload,
-} from "@/schemas/game.schema";
+import { GamesResponseSchema, Game, CreateGamePayload } from "@/schemas/game.schema";
 
 export function useAdminGames() {
   const queryClient = useQueryClient();
 
-  // 1️⃣ GET ALL GAMES (ADMIN)
+  // GET games (pakai endpoint publik karena backend belum sediakan /admin/games GET)
   const gamesQuery = useQuery<Game[]>({
-    queryKey: ["admin-games"],
+    queryKey: ["games"],
     queryFn: async () => {
-      const res = await api.get("/admin/games");
+      const res = await api.get("/games");
       return GamesResponseSchema.parse(res.data);
     },
   });
 
-  // 2️⃣ CREATE GAME
+  // CREATE game (backend minta multipart: name, code, image)
   const createGame = useMutation({
-    mutationFn: async (payload: CreateGamePayload) => {
-      const res = await api.post("/admin/games", payload);
-      return res.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-games"] });
-    },
-  });
+    mutationFn: async ({ name, code, image }: CreateGamePayload) => {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("code", code);
+      formData.append("image", image);
 
-  // 3️⃣ UPDATE GAME
-  const updateGame = useMutation({
-    mutationFn: async ({
-      id,
-      payload,
-    }: {
-      id: number;
-      payload: UpdateGamePayload;
-    }) => {
-      const res = await api.put(`/admin/games/${id}`, payload);
+      const res = await api.post("/admin/games", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-games"] });
-    },
-  });
-
-  // 4️⃣ DELETE / INACTIVE GAME
-  const deleteGame = useMutation({
-    mutationFn: async (id: number) => {
-      const res = await api.delete(`/admin/games/${id}`);
-      return res.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-games"] });
+      queryClient.invalidateQueries({ queryKey: ["games"] });
     },
   });
 
   return {
-    // query
     gamesQuery,
-
-    // mutations
     createGame,
-    updateGame,
-    deleteGame,
   };
 }

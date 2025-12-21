@@ -1,25 +1,43 @@
 import { z } from "zod";
 
-export const GameSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  slug: z.string(),
-  image_url: z.string().url(),
-  is_active: z.boolean(),
+// Bentuk data mentah dari backend (PascalCase + image_url snake_case)
+const GameApiSchema = z.object({
+  ID: z.number(),
+  Name: z.string(),
+  Code: z.string(),
+  image_url: z.string().optional(),
+  IsActive: z.boolean(),
 });
 
-export const GamesResponseSchema = z.array(GameSchema);
+// Normalisasi ke shape frontend
+export type Game = {
+  id: number;
+  name: string;
+  code: string;
+  image_url: string;
+  is_active: boolean;
+};
 
+export const GamesResponseSchema = z
+  .object({
+    data: z.array(GameApiSchema),
+  })
+  .transform(({ data }) =>
+    data.map((game) => ({
+      id: game.ID,
+      name: game.Name,
+      code: game.Code,
+      image_url: game.image_url ?? "",
+      is_active: game.IsActive,
+    }))
+  );
+
+// Schema untuk form admin (sesuai backend: name + code, image lewat multipart)
 export const CreateGameSchema = z.object({
   name: z.string().min(3),
-  slug: z.string().min(3),
-  image_url: z.string().url(),
+  code: z.string().min(2),
 });
 
-export const UpdateGameSchema = CreateGameSchema.partial().extend({
-  is_active: z.boolean().optional(),
-});
-
-export type Game = z.infer<typeof GameSchema>;
-export type CreateGamePayload = z.infer<typeof CreateGameSchema>;
-export type UpdateGamePayload = z.infer<typeof UpdateGameSchema>;
+export type CreateGamePayload = z.infer<typeof CreateGameSchema> & {
+  image: File;
+};
