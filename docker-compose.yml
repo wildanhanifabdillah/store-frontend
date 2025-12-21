@@ -7,6 +7,5 @@ services:
     env_file:
       - .env
     environment:
-      - NODE_ENV=production
-      # Pastikan NEXT_PUBLIC_API_URL di .env atau override di sini.
+      NODE_ENV: production
     restart: unless-stopped
