@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -19,7 +20,7 @@ function formatCurrency(value: number) {
   }).format(value);
 }
 
-export default function CheckoutRedirectPage() {
+function CheckoutRedirectContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("order_id") || searchParams.get("orderId");
 
@@ -168,5 +169,21 @@ export default function CheckoutRedirectPage() {
         </section>
       </main>
     </div>
+  );
+}
+
+export default function CheckoutRedirectPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/70 px-6 py-4 text-sm text-slate-300">
+            Memuat status transaksi...
+          </div>
+        </div>
+      }
+    >
+      <CheckoutRedirectContent />
+    </Suspense>
   );
 }
