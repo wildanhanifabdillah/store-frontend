@@ -1,0 +1,12 @@
+services:
+  frontend:
+    image: ghcr.io/wildanhanifabdillah/store-frontend:latest
+    container_name: store-frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      # Pastikan NEXT_PUBLIC_API_URL di .env atau override di sini.
+    restart: unless-stopped
