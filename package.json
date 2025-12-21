@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "next dev --no-turbo",
+    "build": "next build --no-turbo",
     "start": "next start",
     "lint": "eslint"
   },
@@ -12,6 +12,7 @@
     "@tanstack/react-query": "^5.90.12",
     "@tanstack/react-query-devtools": "^5.91.1",
     "axios": "^1.13.2",
+    "lightningcss": "^1.22.0",
     "next": "16.1.0",
     "next-cloudinary": "^6.17.5",
     "ngrok": "^5.0.0-beta.2",
