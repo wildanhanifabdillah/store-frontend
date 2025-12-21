@@ -17,16 +17,15 @@ function formatCurrency(value: number) {
 export default function AdminTransactionsPage() {
   const router = useRouter();
   const [status, setStatus] = useState<string>("");
-  const [ready, setReady] = useState(false);
+
+  const hasToken =
+    typeof window !== "undefined" && getAdminToken() ? true : false;
 
   useEffect(() => {
-    const token = getAdminToken();
-    if (!token) {
+    if (!hasToken) {
       router.replace("/admin/login");
-    } else {
-      setReady(true);
     }
-  }, [router]);
+  }, [hasToken, router]);
 
   const { data, isLoading, isError, refetch } = useAdminTransactions(status || undefined);
   const txs = useMemo(() => data || [], [data]);
@@ -36,7 +35,7 @@ export default function AdminTransactionsPage() {
     router.replace("/admin/login");
   };
 
-  if (!ready) return null;
+  if (!hasToken) return null;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">

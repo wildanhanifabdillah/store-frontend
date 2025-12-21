@@ -11,19 +11,18 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("admin123");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [ready, setReady] = useState(false);
+
+  const hasToken =
+    typeof window !== "undefined" && getAdminToken() ? true : false;
 
   // Jika sudah login, langsung alihkan ke halaman admin
   useEffect(() => {
-    const alreadyLoggedIn = getAdminToken();
-    if (alreadyLoggedIn) {
+    if (hasToken) {
       router.replace("/admin/games");
-    } else {
-      setReady(true);
     }
-  }, [router]);
+  }, [hasToken, router]);
 
-  if (!ready) return null;
+  if (hasToken) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,9 +37,10 @@ export default function AdminLoginPage() {
       } else {
         setError("Token tidak ditemukan dari server.");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const maybeErr = err as { response?: { data?: { message?: string } } };
       const msg =
-        err?.response?.data?.message || "Login gagal. Periksa email/password.";
+        maybeErr.response?.data?.message || "Login gagal. Periksa email/password.";
       setError(msg);
     } finally {
       setLoading(false);

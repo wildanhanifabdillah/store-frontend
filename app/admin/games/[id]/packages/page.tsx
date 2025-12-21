@@ -22,16 +22,15 @@ export default function AdminGamePackagesPage() {
   const [price, setPrice] = useState<number | string>("");
   const [isActive, setIsActive] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [ready, setReady] = useState(false);
+
+  const hasToken =
+    typeof window !== "undefined" && getAdminToken() ? true : false;
 
   useEffect(() => {
-    const token = getAdminToken();
-    if (!token) {
+    if (!hasToken) {
       router.replace("/admin/login");
-    } else {
-      setReady(true);
     }
-  }, [router]);
+  }, [hasToken, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,8 +50,9 @@ export default function AdminGamePackagesPage() {
       setAmount("");
       setPrice("");
       setIsActive(true);
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || "Gagal menambahkan paket";
+    } catch (err: unknown) {
+      const maybeErr = err as { response?: { data?: { message?: string } } };
+      const msg = maybeErr.response?.data?.message || "Gagal menambahkan paket";
       setError(msg);
     }
   };
@@ -75,7 +75,7 @@ export default function AdminGamePackagesPage() {
     router.replace("/admin/login");
   };
 
-  if (!ready) return null;
+  if (!hasToken) return null;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">

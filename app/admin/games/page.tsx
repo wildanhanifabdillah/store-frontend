@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAdminGames } from "@/hooks/useAdminGames";
+import { type Game } from "@/schemas/game.schema";
 import { clearAdminToken, getAdminToken } from "@/lib/auth";
 
 export default function AdminGamesPage() {
@@ -14,7 +15,6 @@ export default function AdminGamesPage() {
   const [code, setCode] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [ready, setReady] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editName, setEditName] = useState("");
   const [editCode, setEditCode] = useState("");
@@ -22,15 +22,15 @@ export default function AdminGamesPage() {
   const [editImage, setEditImage] = useState<File | null>(null);
   const [editError, setEditError] = useState<string | null>(null);
 
+  const hasToken =
+    typeof window !== "undefined" && getAdminToken() ? true : false;
+
   // Guard: redirect ke login jika tidak ada token
   useEffect(() => {
-    const token = getAdminToken();
-    if (!token) {
+    if (!hasToken) {
       router.replace("/admin/login");
-    } else {
-      setReady(true);
     }
-  }, [router]);
+  }, [hasToken, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,15 +48,16 @@ export default function AdminGamesPage() {
       setName("");
       setCode("");
       setImageFile(null);
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || "Gagal menambahkan game";
+    } catch (err: unknown) {
+      const maybeErr = err as { response?: { data?: { message?: string } } };
+      const msg = maybeErr.response?.data?.message || "Gagal menambahkan game";
       setError(msg);
     }
   };
 
   const games = useMemo(() => gamesQuery.data || [], [gamesQuery.data]);
 
-  const startEdit = (game: any) => {
+  const startEdit = (game: Game) => {
     setEditingId(game.id);
     setEditName(game.name);
     setEditCode(game.code);
@@ -79,8 +80,9 @@ export default function AdminGamesPage() {
       });
       setEditingId(null);
       setEditImage(null);
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || "Gagal memperbarui game";
+    } catch (err: unknown) {
+      const maybeErr = err as { response?: { data?: { message?: string } } };
+      const msg = maybeErr.response?.data?.message || "Gagal memperbarui game";
       setEditError(msg);
     }
   };
@@ -95,7 +97,7 @@ export default function AdminGamesPage() {
     router.replace("/admin/login");
   };
 
-  if (!ready) {
+  if (!hasToken) {
     return null;
   }
 
