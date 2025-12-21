@@ -1,9 +1,16 @@
 import axios from "axios";
 
-export const api = axios.create({
+const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-  timeout: 15000,
+  timeout: 10000,
 });
+
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    console.error("API Error:", err.response?.data || err.message);
+    throw err;
+  }
+);
+
+export default api;
