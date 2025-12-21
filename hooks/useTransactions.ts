@@ -8,7 +8,8 @@ export function useTransaction(orderId: string) {
     enabled: !!orderId,
     queryFn: async () => {
       const res = await api.get(`/transactions/${orderId}`);
-      return TransactionSchema.parse(res.data);
+      const payload = (res.data as { data?: unknown }).data ?? res.data;
+      return TransactionSchema.parse(payload);
     },
   });
 }

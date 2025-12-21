@@ -30,7 +30,9 @@ const TransactionApiSchema = z.object({
   Payment: PaymentApiSchema.optional(),
 });
 
-export type AdminTransaction = {
+type TransactionApi = z.infer<typeof TransactionApiSchema>;
+
+type NormalizedTransaction = {
   id: number;
   order_id: string;
   game_id: number;
@@ -63,48 +65,52 @@ export type AdminTransaction = {
   };
 };
 
+const mapTransaction = (tx: TransactionApi): NormalizedTransaction => ({
+  id: tx.ID,
+  order_id: tx.OrderID,
+  game_id: tx.GameID,
+  package_id: tx.PackageID,
+  game_user_id: tx.GameUserID,
+  email: tx.Email,
+  total_amount: tx.TotalAmount,
+  status: tx.Status,
+  created_at: tx.CreatedAt,
+  updated_at: tx.UpdatedAt,
+  game: tx.Game
+    ? {
+        id: tx.Game.ID,
+        name: tx.Game.Name,
+        code: tx.Game.Code,
+        image_url: tx.Game.image_url ?? "",
+        is_active: tx.Game.IsActive,
+      }
+    : undefined,
+  package: tx.Package
+    ? {
+        id: tx.Package.ID,
+        game_id: tx.Package.GameID,
+        name: tx.Package.Name,
+        amount: tx.Package.Amount,
+        price: tx.Package.Price,
+        is_active: tx.Package.IsActive,
+      }
+    : undefined,
+  payment: tx.Payment
+    ? {
+        gateway: tx.Payment.PaymentGateway,
+        type: tx.Payment.PaymentType,
+        status: tx.Payment.PaymentStatus,
+      }
+    : undefined,
+});
+
+export type Transaction = NormalizedTransaction;
+export type AdminTransaction = NormalizedTransaction;
+
+export const TransactionSchema = TransactionApiSchema.transform(mapTransaction);
+
 export const AdminTransactionsResponseSchema = z
   .object({
     data: z.array(TransactionApiSchema),
   })
-  .transform(({ data }) =>
-    data.map((tx) => ({
-      id: tx.ID,
-      order_id: tx.OrderID,
-      game_id: tx.GameID,
-      package_id: tx.PackageID,
-      game_user_id: tx.GameUserID,
-      email: tx.Email,
-      total_amount: tx.TotalAmount,
-      status: tx.Status,
-      created_at: tx.CreatedAt,
-      updated_at: tx.UpdatedAt,
-      game: tx.Game
-        ? {
-            id: tx.Game.ID,
-            name: tx.Game.Name,
-            code: tx.Game.Code,
-            image_url: tx.Game.image_url ?? "",
-            is_active: tx.Game.IsActive,
-          }
-        : undefined,
-      package: tx.Package
-        ? {
-            id: tx.Package.ID,
-            game_id: tx.Package.GameID,
-            name: tx.Package.Name,
-            amount: tx.Package.Amount,
-            price: tx.Package.Price,
-            is_active: tx.Package.IsActive,
-          }
-        : undefined,
-      payment: tx.Payment
-        ? {
-            gateway: tx.Payment.PaymentGateway,
-            type: tx.Payment.PaymentType,
-            status: tx.Payment.PaymentStatus,
-          }
-        : undefined,
-    }))
-  );
-
+  .transform(({ data }) => data.map(mapTransaction));

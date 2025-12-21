@@ -56,7 +56,7 @@ export default function GameDetailPage() {
       if (redirectUrl) {
         window.location.href = redirectUrl;
       }
-    } catch (_err) {
+    } catch {
       // error ditangani melalui state di bawah
     }
   };
