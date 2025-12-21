@@ -2,18 +2,16 @@
 # Builder
 # =========================
 FROM node:20-bookworm-slim AS builder
-
 WORKDIR /app
 
+ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NEXT_DISABLE_TURBOPACK=1
 
 COPY package*.json ./
-RUN npm ci   # ⬅️ devDependencies MASUK
+RUN npm ci
 
 COPY . .
 RUN npm run build
-
 
 # =========================
 # Runtime
