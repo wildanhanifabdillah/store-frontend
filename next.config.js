@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    unoptimized: true, // hindari 400 dari image optimizer, langsung pakai URL asli
     remotePatterns: [
       {
         protocol: "https",
@@ -40,6 +41,6 @@ const nextConfig = {
       },
     ],
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
