@@ -1,8 +1,13 @@
 import axios from "axios";
 import { getAdminToken } from "@/lib/auth";
 
+const baseURL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.API_URL ||
+  "https://apiweb.whastore.my.id/api/v1";
+
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL,
   timeout: 10000,
 });
 

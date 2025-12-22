@@ -6,6 +6,11 @@ import { useRouter } from "next/navigation";
 import { useAdminTransactions } from "@/hooks/useAdminTransactions";
 import { clearAdminToken, getAdminToken } from "@/lib/auth";
 
+const apiBaseUrl =
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.API_URL ||
+  "https://apiweb.whastore.my.id/api/v1";
+
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -141,7 +146,7 @@ export default function AdminTransactionsPage() {
                       </td>
                       <td className="py-2 pr-4">
                         <Link
-                          href={`${process.env.NEXT_PUBLIC_API_URL}/admin/invoices/${tx.order_id}`}
+                          href={`${apiBaseUrl}/admin/invoices/${tx.order_id}`}
                           className="text-sm text-emerald-300 hover:underline"
                         >
                           Unduh
