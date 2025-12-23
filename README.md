@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WHAStore Frontend
 
-## Getting Started
+Frontend untuk WHAStore (top-up game) berbasis Next.js App Router, React Query, dan Tailwind. Mendukung katalog game, checkout Midtrans, dan dashboard admin transaksi.
 
-First, run the development server:
+## Teknologi
+- Next.js 16 (App Router, Turbopack)
+- TypeScript + React Query
+- TailwindCSS
+- Axios + Zod schema (normalisasi data API)
+- Docker (build & runtime)
 
+## Prasyarat
+- Node.js 20+
+- npm (atau pnpm/yarn/bun, gunakan npm untuk konsistensi CI)
+- Optional: Docker + Docker Compose
+
+## Menjalankan Lokal
+1) Install dependencies  
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm ci
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2) Siapkan env (salin dari contoh)  
+```bash
+cp .env.local .env
+# kemudian isi NEXT_PUBLIC_API_URL, contoh:
+# NEXT_PUBLIC_API_URL=https://apiweb.whastore.my.id/api/v1
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3) Jalankan dev server  
+```bash
+npm run dev
+# buka http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Skrip Penting
+- `npm run dev`    : jalankan di mode pengembangan
+- `npm run lint`   : cek lint
+- `npm run build`  : build produksi (Next)
 
-## Learn More
+## Docker
+Build dan jalankan kontainer:
+```bash
+docker build -t whastore-frontend .
+docker run -p 3000:3000 --env-file .env whastore-frontend
+```
 
-To learn more about Next.js, take a look at the following resources:
+Deploy dengan compose (lihat `docker-compose.yml`):
+```bash
+docker compose pull
+docker compose up -d
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Konfigurasi ENV
+Minimal:
+- `NEXT_PUBLIC_API_URL` : base URL API, contoh `https://apiweb.whastore.my.id/api/v1`
+- `NEXT_PUBLIC_SITE_NAME` : nama brand (opsional)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## CI/CD (GitHub Actions)
+- Job `lint`   : npm ci + lint
+- Job `docker` : build & push image ke GHCR `ghcr.io/wildanhanifabdillah/store-frontend`
+- Job `deploy` : SSH ke VPS, `docker compose pull && up -d`
 
-## Deploy on Vercel
+Pastikan secret berikut terisi: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `VPS_SSH_PORT`, `VPS_FRONTEND_PATH`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Catatan Gambar
+`next.config.js` diset `images.unoptimized = true` untuk menghindari error optimizer. Akses gambar langsung dari CDN yang sudah di-whitelist.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Troubleshooting
+- 404 atau gagal fetch API: cek `NEXT_PUBLIC_API_URL` di env/container.
+- Gambar 400 via `/_next/image`: sudah dinonaktifkan, pastikan deploy terbaru.
+- Lint/type error saat build: jalankan `npm run lint` sebelum push.

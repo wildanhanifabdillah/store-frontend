@@ -32,7 +32,7 @@ export default function HomePage() {
               Dashboard
             </p>
             <h1 className="mt-3 text-3xl md:text-4xl font-bold leading-tight">
-              Temukan top-up game favorit dengan tampilan simpel dan elegan.
+              Temukan top-up game favorit anda dengan simpel dan mudah.
             </h1>
             <p className="mt-4 text-slate-300 md:w-2/3">
               Jelajahi katalog game WHASTORE, pilih paket, dan lanjutkan checkout
